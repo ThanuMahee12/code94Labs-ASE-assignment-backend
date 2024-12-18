@@ -1,6 +1,10 @@
 import express from 'express'
+import ProductController from '../controller/Productcontroller'
+import { Product } from '@prisma/client';
+
 
 const ProductRouter=express.Router()
+const productController =new ProductController()
 ProductRouter.route("/").
 get((req,res)=>{
 
