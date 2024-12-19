@@ -1,2 +1,2 @@
 
-export const item_per_page=parseInt(process.env.ITEM_PER_PAGE??"20",20)
+export const items_per_page=parseInt(process.env.ITEM_PER_PAGE??"0",0)
