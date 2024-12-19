@@ -43,10 +43,10 @@ interface CrudController {
   
     /**
      * Searches for objects matching the specified keyword.
-     * @param keyword - The search keyword (optional).
+     * @param keyword,page - The search keyword (optional) and page(optional).
      * @returns A promise resolving to the search results.
      */
-    searchByKeyword: (keyword?: string | number) => Promise<Object>;
+    searchByKeyword: (keyword?: string | number,page?:number) => Promise<Object>;
   }
   
   export default CrudController
