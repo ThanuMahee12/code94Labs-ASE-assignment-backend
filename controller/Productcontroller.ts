@@ -3,10 +3,13 @@ import { Product } from '@prisma/client';
 import prismaClient from './../prisma/prismaClient';
 import Controller from './Controller';
 import CrudController from './CrudController';
-import { item_per_page } from '../helper/Env';
+import { items_per_page } from '../helper/Env';
 
 
 class ProductController extends Controller implements CrudController {
+    constructor(){
+        super()
+    }
     /**
      * Adds a new product to the database.
      * @param obj - The product object to add.
@@ -34,17 +37,17 @@ class ProductController extends Controller implements CrudController {
     async all(page?:number):Promise<Object>{
         try {
     const count=await prismaClient.product.count()
-    const lastPage=count/item_per_page
+    const lastPage=items_per_page!==0?(count%items_per_page):1
     const currentPage=page??1
     const data=await prismaClient.product.findMany({
-        skip:currentPage,
-        take:item_per_page,
+        skip:currentPage-1,
+        take:items_per_page!==0?items_per_page:count
     })
     return {
         currentPage,
         lastPage,
         data,
-        count
+        count,
     }
         } catch (error) {
             throw new Error(`Failed to show product: ${(error as Error).message}`);
@@ -124,11 +127,11 @@ return product
         try {
               // Use Prisma's query with the "contains" operator for partial string matching
     const count=await prismaClient.product.count()
-    const lastPage=count/item_per_page
+    const lastPage=count/items_per_page
     const currentPage=page??1
         const data = await prismaClient.product.findMany({
             skip:currentPage,
-            take:item_per_page,
+            take:items_per_page,
             where: {
                 OR: [
                     {
@@ -163,4 +166,5 @@ return product
     }
 
 }
+
 export default ProductController
