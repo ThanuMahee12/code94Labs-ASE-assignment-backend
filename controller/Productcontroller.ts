@@ -105,6 +105,14 @@ class ProductController extends Controller implements CrudController {
             let product=await prismaClient.product.findFirstOrThrow({where:{
                 id:productid.toString()
             }})
+            const updatedImages = product?.images.filter((img) => !obj?.removeImages?.includes(img));
+      const newImages = files.map((file) => `/uploads/${file.filename}`);
+      const images = [...updatedImages, ...newImages];
+         // Validate mainImage
+         if (!images.includes(obj?.mainImage)) {
+            return res.status(400).json({ error: "Main image must be one of the product images" });
+          }
+    
             product=await prismaClient.product.update({where:{
         id:productid.toString(),
     },

@@ -2,6 +2,7 @@
 import express from 'express'; // Importing express for routing
 import ProductController from '../controller/Productcontroller'; // Importing ProductController to manage business logic
 import { Product } from '@prisma/client'; // Importing Product type from Prisma schema
+import { upload } from '../helper/multerConfig';
 
 // Create an instance of express Router for defining product routes
 const ProductRouter = express.Router();
@@ -31,14 +32,23 @@ ProductRouter.route("/")
   /**
    * POST / - Add a new product.
    */
-  .post(async (req, res) => {
+  .post( upload.array("images", 10),async (req, res) => {
     const { body: { name, description, sku, quantity } } = req;
+    const files = req.files as Express.Multer.File[];
     try {
+     
+      if (!files || files.length === 0) {
+         res.status(400).json({ error: "At least one image is required" });
+      }
+      const imagePaths = files.map((file) => `/uploads/${file.filename}`);
+      const mainImage = imagePaths[0];
       const result = await productController.addNew({
         name,
         description,
         sku,
-        quantity,
+        quantity: parseInt(quantity),
+        images: imagePaths,
+        mainImage,
       });
       res.status(200).json(result);
     } catch (error) {
@@ -67,8 +77,8 @@ ProductRouter.route("/:productid")
   /**
    * PUT /:productid - Update a product by its ID.
    */
-  .put(async (req, res) => {
-    const { params: { productid }, body: { name, description, sku, quantity } } = req;
+  .put( upload.array("images", 10),async (req, res) => {
+    const { params: { productid }, body: { name, description, sku, quantity, mainImage, removeImages } } = req;
     try {
       if (!productid) throw new Error("Invalid product ID.");
       const result = await productController.update(productid, {
@@ -76,7 +86,9 @@ ProductRouter.route("/:productid")
         description,
         sku,
         quantity,
+        mainImage, removeImages
       });
+      const files = req.files as Express.Multer.File[];
       res.status(200).json(result);
     } catch (error) {
       res.status(500).json({ error: (error as Error).message || "Failed to update product." });

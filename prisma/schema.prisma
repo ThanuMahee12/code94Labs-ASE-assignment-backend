@@ -15,25 +15,15 @@ datasource db {
 
 // Product model
 model Product {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId // MongoDB ObjectId as the primary key
-  name        String    @db.String                                    // Product name
-  description String?   @db.String                                    // Optional product description
-  sku         String    @unique @db.String                            // Unique SKU identifier
-  quantity    Int       @db.Int                                       // Product quantity
-  images      Image[]   @relation("ProductImages")
-  createdAt   DateTime  @default(now())                   // Timestamp for when the product was created
-  updatedAt   DateTime  @updatedAt                        // Timestamp for when the product was last updated
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String
+  sku         String
+  quantity    Int
+  images      String[]
+  mainImage   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
-// Image model
-model Image {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId // MongoDB ObjectId as the primary key
-  url       String   @db.String                                  // URL of the image
-  isMain    Boolean  @default(false)
-  // Many-to-one relationship to Product
-  productId  String  @db.ObjectId
-  product   Product  @relation("ProductImages", fields: [productId], references: [id]) // Each image belongs to one product
-  createdAt DateTime @default(now())             // Timestamp for when the image was created
-  updatedAt DateTime @updatedAt                     // Timestamp for when the image was last updated
 
-}
